@@ -1,5 +1,7 @@
 # aps-ED
-Atividade Prática Supervisionada de Estrutura de Dados
+Atividade Prática Supervisionada de Estrutura de Dados em dupla.
+
+Parceiro: @leleonak47
 
 
 A Atividade Prática Supervisionada será composta pelas seguintes
