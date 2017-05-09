@@ -174,6 +174,10 @@ int main(){
 					printf("Não encontrado!");
 				}
 				break;
+			case 3:
+				system("cls");
+				percorre();
+				break;
 			default:
 				printf("Erro\n");
 				break;
