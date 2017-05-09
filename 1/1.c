@@ -88,6 +88,23 @@ no *busca(cod){
 	return NULL;
 }
 
+int buscaP(){
+	no *aux;
+	aux=inicio;
+	float maior = -999999;
+	int cod;
+	
+	while(aux!=NULL){
+		if(aux->pv>maior){
+			maior = aux->pv;
+			cod=aux->cod;
+		}
+		aux=aux->prox;
+	}
+	
+	return cod;
+}
+
 void pegaDados(){
 	int cod, qtd;
 	char nome[100], resp;
@@ -129,9 +146,10 @@ void pegaDados(){
 }
 int main(){
 	setlocale(LC_ALL,"portuguese");
-	int op, cod, qtd, c;
+	int op, cod, qtd, c, x;
 	char nome[100], resp;
 	float pc, pv;
+	no *aux2;
 	
 	criaLista();
 	
@@ -178,8 +196,24 @@ int main(){
 				system("cls");
 				percorre();
 				break;
+			case 4:
+				
+				
+				x=buscaP();
+				
+				aux2=busca(x);
+				
+				printf("%s, ", aux2->nome);
+				printf("código: %d, ", aux2->cod);
+				printf("quantidade em estoque %d, ", aux2->qtd);
+				printf("preço de compra %.2f, ", aux2->pc);
+				printf("preço de venda %.2f.\n\n", aux2->pv);
+				break;
+				
 			default:
-				printf("Erro\n");
+				system("cls");
+				printf("Saindo...\n");
+				return 0;
 				break;
 				
 		}
