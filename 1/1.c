@@ -73,49 +73,86 @@ void percorre(){
 		aux=aux->prox;
 	}
 }
+
+no *busca(cod){
+	no *aux;
+	aux=inicio;
+	
+	while(aux!=NULL){
+		if(aux->cod==cod){
+			return aux;
+		}
+		aux=aux->prox;
+	}
+	
+	return NULL;
+}
 int main(){
 	setlocale(LC_ALL,"portuguese");
-	int op, cod, qtd;
+	int op, cod, qtd, c;
 	char nome[100], resp;
 	float pc, pv;
 	
 	criaLista();
 	
-	printf("1- Inserir dados de novo produto\n2- Consultar dados de um produto\n3- Imprimir dados de todos os produtos\n4- Imprimir produto mais caro\n5- Sair\n\n");
-	scanf("%d", &op);
-	fflush(stdin);
 	
-	switch(op){
-		case 1:
-			do{
+	do{
+		printf("1- Inserir dados de novo produto\n2- Consultar dados de um produto\n3- Imprimir dados de todos os produtos\n4- Imprimir produto mais caro\n5- Sair\n\n");
+		scanf("%d", &op);
+		
+		switch(op){
+			case 1:
+				do{
+					system("cls");
+					fflush(stdin);
+					printf("Digite o nome: \n");
+					gets(nome);
+					printf("Digite o código: \n");
+					scanf("%d", &cod);
+					printf("Digite a quantidade em estoque: \n");
+					scanf("%d", &qtd);
+					fflush(stdin);
+					printf("Digite o preço de compra: \n");
+					scanf("%f", &pc);
+					printf("Digite o preço de venda: \n");
+					scanf("%f", &pv);
+					
+					insere(nome, cod, qtd, pc, pv);
+					
+					system("cls");
+					printf("Deseja continuar? Digite \"S\" para sim.\n");
+					scanf("%s", &resp);
+					resp=toupper(resp);
+				}while(resp=='S');
+				
+				
+				break;
+			case 2:
 				system("cls");
-				fflush(stdin);
-				printf("Digite o nome: \n");
-				gets(nome);
-				printf("Digite o código: \n");
+				printf("Digite o código do produto desejado: \n");
 				scanf("%d", &cod);
-				printf("Digite a quantidade em estoque: \n");
-				scanf("%d", &qtd);
-				fflush(stdin);
-				printf("Digite o preço de compra: \n");
-				scanf("%f", &pc);
-				printf("Digite o preço de venda: \n");
-				scanf("%f", &pv);
+				no *aux;
+				aux=busca(cod);
+				if(aux!=NULL){
+					printf("%s, ", aux->nome);
+					printf("código: %d, ", aux->cod);
+					printf("quantidade em estoque %d, ", aux->qtd);
+					printf("preço de compra %.2f, ", aux->pc);
+					printf("preço de venda %.2f.\n\n", aux->pv);
+				}else{
+					printf("Não encontrado!");
+				}
+				break;
+			default:
+				printf("Erro\n");
+				break;
 				
-				insere(nome, cod, qtd, pc, pv);
-				
-				system("cls");
-				printf("Deseja continuar? Digite \"S\" para sim.\n");
-				resp=getch();
-				resp=toupper(resp);
-			}while(resp=='S');
-			
-			
-			break;
-		default:
-			printf("Erro\n");
-			break;
-	}
+		}
 	
-	return 0;
+
+	printf("Deseja continuar? Digite \"1\" para sim.\n");
+	scanf("%d", &c);
+	}while(c==1);
+
+return 0;
 }
