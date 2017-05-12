@@ -1,25 +1,19 @@
-/*Faça um programa em C que gerencie os dados de produtos de uma
-loja através do uso de listas simplesmente encadeadas. Os dados
-dos produtos são: código, nome, quantidade em estoque, preço de
-compra, preço de venda.
-
-O programa deve apresentar um menu com as seguintes opções:
-1- Inserir dados de novo produto
-2- Consultar dados de um produto
-3- Imprimir dados de todos os produtos
-4- Imprimir produto mais caro
-5- Sair
-
-Obs.:
-- O usuário pode cadastrar produtos enquanto desejar, isto é, o
-limite de cadastro é a memória do computador.
-- Em caso de haver mais de um produto com maior preço de venda,
+/*- Em caso de haver mais de um produto com maior preço de venda,
 todos devem ser impressos*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
 #include <ctype.h>
+
+typedef struct maior{
+	int cod, qtd;
+	char nome[100];
+	float pc, pv;
+	struct maior *prox;
+}maior;
+
+maior *inicioMaior;
 
 typedef struct no{
 	int cod, qtd;
@@ -32,6 +26,7 @@ no *inicio;
 
 void criaLista(){
 	inicio=NULL;
+	inicioMaior==NULL;
 }
 
 no *criaNo(char nome[], int cod, int qtd, float pc, float pv){
@@ -51,17 +46,47 @@ no *criaNo(char nome[], int cod, int qtd, float pc, float pv){
 	return aux;
 }
 
-void insere(char nome[], int cod, int qtd, float pc, float pv){
-	no *aux;
-	aux = criaNo(nome, cod, qtd, pc, pv);
-	printf("foi");
-	aux->prox=inicio;
-	inicio=aux;
+maior *criaNoMaior(int cod, int qtd, float pc, float pv, char nome[]){
+	maior *aux;
+	aux = (maior*)malloc(sizeof(maior));
+	
+	if(aux){
+		aux->cod=cod;
+		aux->qtd=qtd;
+		aux->pc=pc;
+		aux->pv=pv;
+		strcpy(aux->nome, nome);
+		
+		aux->prox=NULL;
+	}
 }
 
+void insereMaior(int cod, int qtd, float pc, float pv, char nome[]){
+	maior *aux;
+	aux = criaNoMaior(cod, qtd, pc, pv, nome);
+	
+	aux->prox=inicioMaior;
+	inicioMaior=aux;
+}
+	
 void percorre(){
 	no *aux;
 	aux=inicio;
+	
+	while(aux!=NULL){
+		printf("%s, ", aux->nome);
+		printf("código: %d, ", aux->cod);
+		printf("quantidade em estoque %d, ", aux->qtd);
+		printf("preço de compra %.2f, ", aux->pc);
+		printf("preço de venda %.2f.\n\n", aux->pv);
+		
+		aux=aux->prox;
+	}
+}
+
+void percorreProd(){
+	maior *aux;
+	aux = inicioMaior;
 	
 	while(aux!=NULL){
 		printf("%s, ", aux->nome);
@@ -88,21 +113,77 @@ no *busca(cod){
 	return NULL;
 }
 
-int buscaP(){
+
+int verifica(char nome[], int cod, int qtd, float pc, float pv){
 	no *aux;
-	aux=inicio;
-	float maior = -999999;
-	int cod;
+	aux = inicio;
 	
-	while(aux!=NULL){
-		if(aux->pv>maior){
-			maior = aux->pv;
-			cod=aux->cod;
+	if(inicio==NULL){//se tiver no inicio da lista deixa inserir
+		return 1;
+	}else{
+		while(aux!=NULL){
+			if(cod==aux->cod){
+				return 0;
+			}
+			
+			aux=aux->prox;
 		}
-		aux=aux->prox;
+		return 1; //nao encontrou igual
 	}
 	
-	return cod;
+}
+
+void verificaPreco(char nome[], int cod, int qtd, float pc, float pv){
+	no *aux;
+	aux = inicio;
+	maior *aux2;
+	aux2 = (maior*) malloc(sizeof(maior));
+	
+	aux2->cod = aux->cod;
+	aux2->pc = pc;
+	aux2->pv = pv;
+	aux2->qtd = qtd;
+	strcpy(aux2->nome, nome);
+	aux2->prox=NULL;
+
+ 	if(inicioMaior==NULL){ //se a lista estiver vazia o promeiro será o mais caro
+		inicioMaior = aux2;
+		return ;
+		
+	}else if(aux2->pv > inicioMaior->pv){
+		inicioMaior = aux2;
+		inicioMaior->prox = NULL;
+		return ;
+		
+	}else if(aux2->pv == inicioMaior->pv){
+		aux2->prox=inicioMaior;
+		inicioMaior = aux2;
+		return ;
+			
+	}else{
+		return ;
+		}
+	
+	}	
+
+
+void insere(char nome[], int cod, int qtd, float pc, float pv){
+	no *aux;
+	int x, z;
+	x=verifica(nome, cod, qtd, pc, pv);
+
+	if(x==1){//se nao tiver codigo igual insere
+		aux = criaNo(nome, cod, qtd, pc, pv);
+		aux->prox=inicio;
+		inicio=aux;
+	
+		verificaPreco(nome, cod, qtd, pc, pv);//Irá verificiar e add no struct dos produtos caros
+		system("pause");
+	}else{
+		printf("Código existente. Insira novamente com outro código.\n\n");
+		system("pause");
+	}
+	
 }
 
 void pegaDados(){
@@ -134,16 +215,17 @@ void pegaDados(){
 		}
 	printf("Digite o preço de venda: \n");
 	scanf("%f", &pv);
-	if(pv<0){	
+	if(pv<=0){	
 		while(pv<=0){
 			printf("Digite um preço de venda maior que zero.\n");
 			scanf("%f", &pv);
 			}
 		}
+		
 	insere(nome, cod, qtd, pc, pv);
 	
-	
 }
+
 int main(){
 	setlocale(LC_ALL,"portuguese");
 	int op, cod, qtd, c, x;
@@ -160,7 +242,7 @@ int main(){
 	system("cls");
 	
 	do{
-		printf("1- Inserir dados de novo produto\n2- Consultar dados de um produto\n3- Imprimir dados de todos os produtos\n4- Imprimir produto mais caro\n5- Sair\n\n");
+		printf("1- Inserir dados de novo produto\n2- Consultar dados de um produto\n3- Imprimir dados de todos os produtos\n4- Imprimir produto(s) mais caro(s)\n5- Sair\n\n");
 		scanf("%d", &op);
 		
 		switch(op){
@@ -169,11 +251,10 @@ int main(){
 					pegaDados();					
 					system("cls");
 					
-					printf("Deseja continuar? Digite \"S\" para sim.\n");
+					printf("Deseja continuar o cadastro? Digite \"S\" para sim.\n");
 					scanf("%s", &resp);
 					resp=toupper(resp);
 				}while(resp=='S');
-				
 				
 				break;
 			case 2:
@@ -197,17 +278,8 @@ int main(){
 				percorre();
 				break;
 			case 4:
-				
-				
-				x=buscaP();
-				
-				aux2=busca(x);
-				
-				printf("%s, ", aux2->nome);
-				printf("código: %d, ", aux2->cod);
-				printf("quantidade em estoque %d, ", aux2->qtd);
-				printf("preço de compra %.2f, ", aux2->pc);
-				printf("preço de venda %.2f.\n\n", aux2->pv);
+				system("cls");
+				percorreProd();
 				break;
 				
 			default:
