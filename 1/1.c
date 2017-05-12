@@ -1,5 +1,3 @@
-/*- Em caso de haver mais de um produto com maior preço de venda,
-todos devem ser impressos*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -29,7 +27,7 @@ void criaLista(){
 	inicioMaior==NULL;
 }
 
-no *criaNo(char nome[], int cod, int qtd, float pc, float pv){
+no *criaNo(char nome[], int cod, int qtd, float pc, float pv){//cria nós da estrutura de prods
 	no *aux;
 	aux = (no*) malloc(sizeof(no));
 	
@@ -46,7 +44,7 @@ no *criaNo(char nome[], int cod, int qtd, float pc, float pv){
 	return aux;
 }
 
-maior *criaNoMaior(int cod, int qtd, float pc, float pv, char nome[]){
+maior *criaNoMaior(int cod, int qtd, float pc, float pv, char nome[]){//cria nós da estrutura de prods caros
 	maior *aux;
 	aux = (maior*)malloc(sizeof(maior));
 	
@@ -59,9 +57,11 @@ maior *criaNoMaior(int cod, int qtd, float pc, float pv, char nome[]){
 		
 		aux->prox=NULL;
 	}
+	
+	return aux;
 }
 
-void insereMaior(int cod, int qtd, float pc, float pv, char nome[]){
+void insereMaior(int cod, int qtd, float pc, float pv, char nome[]){// insere na struct de prods caros
 	maior *aux;
 	aux = criaNoMaior(cod, qtd, pc, pv, nome);
 	
@@ -69,37 +69,37 @@ void insereMaior(int cod, int qtd, float pc, float pv, char nome[]){
 	inicioMaior=aux;
 }
 	
-void percorre(){
-	no *aux;
-	aux=inicio;
+void percorre(int i){//reaproveitando código através do parâmetro que indicará a ocasião
+	if(i==1){
+		no *aux;
+		aux=inicio;
 	
-	while(aux!=NULL){
-		printf("%s, ", aux->nome);
-		printf("código: %d, ", aux->cod);
-		printf("quantidade em estoque %d, ", aux->qtd);
-		printf("preço de compra %.2f, ", aux->pc);
-		printf("preço de venda %.2f.\n\n", aux->pv);
-		
-		aux=aux->prox;
+		while(aux!=NULL){
+			printf("%s, ", aux->nome);
+			printf("código: %d, ", aux->cod);
+			printf("quantidade em estoque %d, ", aux->qtd);
+			printf("preço de compra %.2f, ", aux->pc);
+			printf("preço de venda %.2f.\n\n", aux->pv);
+			
+			aux=aux->prox;
+		}
+	}else{
+		maior *aux;
+		aux = inicioMaior;
+	
+		while(aux!=NULL){
+			printf("%s, ", aux->nome);
+			printf("código: %d, ", aux->cod);
+			printf("quantidade em estoque %d, ", aux->qtd);
+			printf("preço de compra %.2f, ", aux->pc);
+			printf("preço de venda %.2f.\n\n", aux->pv);
+			
+			aux=aux->prox;
+		}
 	}
 }
 
-void percorreProd(){
-	maior *aux;
-	aux = inicioMaior;
-	
-	while(aux!=NULL){
-		printf("%s, ", aux->nome);
-		printf("código: %d, ", aux->cod);
-		printf("quantidade em estoque %d, ", aux->qtd);
-		printf("preço de compra %.2f, ", aux->pc);
-		printf("preço de venda %.2f.\n\n", aux->pv);
-		
-		aux=aux->prox;
-	}
-}
-
-no *busca(cod){
+no *busca(int cod){
 	no *aux;
 	aux=inicio;
 	
@@ -114,11 +114,11 @@ no *busca(cod){
 }
 
 
-int verifica(char nome[], int cod, int qtd, float pc, float pv){
+int verifica(char nome[], int cod, int qtd, float pc, float pv){//verifica se existe código igual já cadastrado
 	no *aux;
 	aux = inicio;
 	
-	if(inicio==NULL){//se tiver no inicio da lista deixa inserir
+	if(aux==NULL){//se tiver no inicio da lista deixa inserir
 		return 1;
 	}else{
 		while(aux!=NULL){
@@ -137,35 +137,23 @@ void verificaPreco(char nome[], int cod, int qtd, float pc, float pv){
 	no *aux;
 	aux = inicio;
 	maior *aux2;
-	aux2 = (maior*) malloc(sizeof(maior));
 	
-	aux2->cod = aux->cod;
-	aux2->pc = pc;
-	aux2->pv = pv;
-	aux2->qtd = qtd;
-	strcpy(aux2->nome, nome);
-	aux2->prox=NULL;
+	aux2=criaNoMaior(cod, qtd, pc, pv, nome);
 
- 	if(inicioMaior==NULL){ //se a lista estiver vazia o promeiro será o mais caro
+ 	if(inicioMaior==NULL){ //se a lista estiver vazia o primeiro será o mais caro
 		inicioMaior = aux2;
-		return ;
-		
+	
 	}else if(aux2->pv > inicioMaior->pv){
 		inicioMaior = aux2;
 		inicioMaior->prox = NULL;
-		return ;
 		
 	}else if(aux2->pv == inicioMaior->pv){
 		aux2->prox=inicioMaior;
 		inicioMaior = aux2;
-		return ;
 			
-	}else{
-		return ;
-		}
+	}
 	
-	}	
-
+}	
 
 void insere(char nome[], int cod, int qtd, float pc, float pv){
 	no *aux;
@@ -177,10 +165,10 @@ void insere(char nome[], int cod, int qtd, float pc, float pv){
 		aux->prox=inicio;
 		inicio=aux;
 	
-		verificaPreco(nome, cod, qtd, pc, pv);//Irá verificiar e add no struct dos produtos caros
+		verificaPreco(nome, cod, qtd, pc, pv);//Irá verificiar e adicionar no struct dos produtos caros
 		system("pause");
 	}else{
-		printf("Código existente. Insira novamente com outro código.\n\n");
+		printf("Código existente. Insira novamente com outro código diferente.\n\n");
 		system("pause");
 	}
 	
@@ -198,23 +186,28 @@ void pegaDados(){
 	scanf("%d", &cod);
 	printf("Digite a quantidade em estoque: \n");
 	scanf("%d", &qtd);
+	
 	if(qtd<0){
 		while(qtd<0){
 			printf("Digite uma quantidade em estoque maior ou igual a zero.\n");
 			scanf("%d", &qtd);
 			}
 	}
+	
 	fflush(stdin);
-	printf("Digite o preço de compra: \n");
+	printf("Digite o preço de compra: \n");//utilizar vírgula para separar real de centavos nesse e no outro
 	scanf("%f", &pc);
+	
 	if(pc<=0){	
 		while(pc<=0){
 			printf("Digite um preço de compra maior que zero.\n");
 			scanf("%f", &pc);
 			}
 		}
+		
 	printf("Digite o preço de venda: \n");
 	scanf("%f", &pv);
+	
 	if(pv<=0){	
 		while(pv<=0){
 			printf("Digite um preço de venda maior que zero.\n");
@@ -228,17 +221,15 @@ void pegaDados(){
 
 int main(){
 	setlocale(LC_ALL,"portuguese");
-	int op, cod, qtd, c, x;
+	
+	int op, cod, qtd, c;
 	char nome[100], resp;
 	float pc, pv;
-	no *aux2;
 	
-	criaLista();
+	criaLista(); //cria a lista dos caros e a dos produtos
 	
 	printf("Bem-vindo. Digite os dados do primeiro produto: \n\n");
 	pegaDados();
-	
-	
 	system("cls");
 	
 	do{
@@ -247,22 +238,18 @@ int main(){
 		
 		switch(op){
 			case 1:
-				do{
-					pegaDados();					
-					system("cls");
-					
-					printf("Deseja continuar o cadastro? Digite \"S\" para sim.\n");
-					scanf("%s", &resp);
-					resp=toupper(resp);
-				}while(resp=='S');
-				
+				pegaDados();					
+				system("cls");
 				break;
+				
 			case 2:
 				system("cls");
 				printf("Digite o código do produto desejado: \n");
 				scanf("%d", &cod);
+				
 				no *aux;
 				aux=busca(cod);
+				
 				if(aux!=NULL){
 					printf("%s, ", aux->nome);
 					printf("código: %d, ", aux->cod);
@@ -273,24 +260,32 @@ int main(){
 					printf("Não encontrado!");
 				}
 				break;
+				
 			case 3:
 				system("cls");
-				percorre();
+				percorre(1);
 				break;
+				
 			case 4:
 				system("cls");
-				percorreProd();
+				percorre(2);
+				break;
+				
+			case 5:
+				system("cls");
+				printf("Saindo...");
 				break;
 				
 			default:
 				system("cls");
-				printf("Saindo...\n");
-				return 0;
+				printf("Opção inválida...\n");
 				break;
-				
 		}
 	
-
+	if(op==5){//para o do...while quando a opção é 5 para que não pergunte se deseja continuar
+		break;
+	}
+	
 	printf("Deseja continuar? Digite \"1\" para sim.\n");
 	scanf("%d", &c);
 	}while(c==1);
